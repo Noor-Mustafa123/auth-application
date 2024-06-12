@@ -25,6 +25,7 @@ public class AuthenticationController {
 
 
     @PostMapping("/authenticate")
+//     i have made this change
     public void registerNewUser() {
         System.out.println("The controller has been reached");
     }
