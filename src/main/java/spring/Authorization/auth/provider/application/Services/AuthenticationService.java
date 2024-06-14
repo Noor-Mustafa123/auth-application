@@ -43,6 +43,8 @@ public class AuthenticationService {
 
         var token = jwtService.generatedToken(UserObj);
         var refreshToken = jwtService.generateRefreshToken(UserObj);
+        int length = refreshToken.length();
+        System.out.println("The length of the string is: " + length);
         //        creating the object of the token entity to save it
         var TokenObj = TokenEntity.builder()
                 .user(UserObj)

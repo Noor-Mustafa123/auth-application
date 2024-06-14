@@ -43,7 +43,7 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
 
         List<User> userList = userRepo.findByEmail(email);
 
-        User user = userList.getFirst();
+        User user = userList.get(0);
 
         List<TokenEntity> listOfTokens = user.getTokens();
 
@@ -63,5 +63,9 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
 //  TODO:  create a method in the jwtService that extracts the subject form the jwttoken
 
 
+// *this is not info
+// ? this is informational
+//  ! BUG HINTS that if i register with role USER it registers and returns key but if i register with ADMIN it returns unauthorized
+//! also the data for the user of an admin is being saved to the database but no token is being saved for the ADMIN user when he registers
     }
 }
