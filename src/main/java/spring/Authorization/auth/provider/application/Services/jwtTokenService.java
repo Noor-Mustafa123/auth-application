@@ -12,6 +12,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 
@@ -83,6 +84,19 @@ private Key getSignInKey() {
                .parseClaimsJws(token)
                .getBody();
 
+    }
+
+    //this method is used to extract any specific claim by name
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getAllClaims(token);
+//    we are getting the object of the FunctionInterface we are using methods of that class
+        return claimsResolver.apply(claims);
+    }
+
+    public String extractUsername(String token) {
+//    The Claims::getSubject syntax is a method reference, which is a shorthand syntax for a lambda expression. It's used to point to a method without executing it. When you use this method reference, Java will automatically provide the instance of Claims for you.
+//    The claims is an interface so in order to get mthod from it we need to create a class first but here is where lambda expression comes in when using the
+        return extractClaim(token, Claims::getSubject);
     }
 
 

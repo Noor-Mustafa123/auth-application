@@ -31,15 +31,17 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
         final var jwtToken = request.getHeader("Authorization");
 //     check for the token presence and type
 
-        if (jwtToken == null || !jwtToken.contains("Bearer")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        if (jwtToken == null || !jwtToken.contains("Bearer")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
 //      get the email from the body of the jwt token and check it in the database
         String jwt = jwtToken.substring(7);
         Claims claims = jwtService.getAllClaims(jwt);
         String email = claims.getSubject();
+        System.out.println(email);
+        System.out.println(claims);
 
         List<User> userList = userRepo.findByEmail(email);
 
