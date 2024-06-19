@@ -1,10 +1,9 @@
 package spring.Authorization.auth.provider.application.Entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -24,6 +23,7 @@ public class User implements UserDetails {
     @GeneratedValue
     private Integer id;
 
+
     private String firstname;
     private String lastname;
     private String email;
@@ -34,6 +34,9 @@ public class User implements UserDetails {
     private Role role;
 
     @OneToMany(mappedBy = "user")
+//    ? you can use the FetchMode.JOIN strategy to tell Hibernate to fetch the associated TokenEntity objects when it fetches a User object. This is known as eager fetching.
+    @Fetch(FetchMode.JOIN)
+    @ToString.Exclude
     private List<TokenEntity> tokens = new ArrayList<>();
 
 

@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,15 +16,19 @@ import spring.Authorization.auth.provider.application.Services.jwtTokenService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Configuration
 public class JwtSecurityFilter extends OncePerRequestFilter {
     @Autowired
     jwtTokenService jwtService;
-    @Autowired
-    UserRepository userRepo;
+
 
     @Override
+//    TODO: --> -->
+//   * the transactional annotation wont work because it only works on spring managed beans and this filter is not so i need to move the transactional functionality into a service layer
+//   ? Check the error comment on the userRepo method call in the method to see the reason for this annotation
+
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 //    TODO: check if the token is present and is of bearer type
 //    TODO: get the subject email or username and match it with the database
@@ -31,31 +36,29 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
         final var jwtToken = request.getHeader("Authorization");
 //     check for the token presence and type
 
-//        if (jwtToken == null || !jwtToken.contains("Bearer")) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
+        if (jwtToken == null || !jwtToken.contains("Bearer")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
 //      get the email from the body of the jwt token and check it in the database
         String jwt = jwtToken.substring(7);
         Claims claims = jwtService.getAllClaims(jwt);
-        String email = claims.getSubject();
-        System.out.println(email);
-        System.out.println(claims);
+        String email = jwtService.extractUsername(jwt);
+        User user = jwtService.getUserFromDatabase(jwt);
 
-        List<User> userList = userRepo.findByEmail(email);
 
-        User user = userList.get(0);
+//  ! Here, you're trying to access the tokens collection of a User entity outside of a transactional context. When the user.getTokens() method is called, Hibernate tries to fetch the tokens collection from the database. However, because the Hibernate Session has already been closed (as the findByEmail method has completed), it can't fetch the collection, resulting in the LazyInitializationException.
 
-        List<TokenEntity> listOfTokens = user.getTokens();
 
-        TokenEntity tokenObj = listOfTokens.get(1);
-
+      TokenEntity tokenObj = jwtService.getTokenObjFromUserObj(jwt);
         String token = tokenObj.getToken();
+        System.out.println(token);
+        System.out.println(jwt);
 
-        if(token == jwt){
+        if(Objects.equals(token, jwt)){
             filterChain.doFilter(request,response);
-            System.out.println("The token matched sucessfully");
+            System.out.println("The token matched successfully");
             return;
         }
         else{

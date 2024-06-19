@@ -1,10 +1,7 @@
 package spring.Authorization.auth.provider.application.Entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Builder
@@ -32,6 +29,7 @@ public class TokenEntity {
 
     // make a one ot many relationship
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     public User user;
 
 
