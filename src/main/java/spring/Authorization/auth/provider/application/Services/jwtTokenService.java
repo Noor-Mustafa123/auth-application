@@ -82,6 +82,7 @@ public class jwtTokenService {
 
 
     //create a method to get all claims from the token
+    //create a method to get all claims from the token
     public Claims getAllClaims(String token) {
         return Jwts
                 .parserBuilder()
@@ -102,7 +103,7 @@ public class jwtTokenService {
 
     public String extractUsername(String token) {
 //    The Claims::getSubject syntax is a method reference, which is a shorthand syntax for a lambda expression. It's used to point to a method without executing it. When you use this method reference, Java will automatically provide the instance of Claims for you.
-//    The claims is an interface so in order to get mthod from it we need to create a class first but here is where lambda expression comes in when using the
+//    The claims is an interface so in order to get method from it we need to create a class first but here is where lambda expression comes in when using the
         return extractClaim(token, Claims::getSubject);
     }
 
