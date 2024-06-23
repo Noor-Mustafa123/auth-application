@@ -13,7 +13,7 @@ public class TokenEntity {
     @Id
     @GeneratedValue
     public Integer id;
-//    this annotation means that tthere should be no duplicate values in the database
+//    this annotation means that there should be no duplicate values in the database
     @Column(unique = true)
     public String refreshToken;
 

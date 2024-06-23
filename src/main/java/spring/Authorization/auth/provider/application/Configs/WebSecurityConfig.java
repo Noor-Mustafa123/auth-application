@@ -46,10 +46,14 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-
+// ? FLUENT API is used for configuration
         http
-//? because we are not using cookies for session managenent then we are dont need the csrf property
+// * because we are not using cookies for session management then we are dont need the csrf property active so we disable it
                 .csrf(AbstractHttpConfigurer::disable)
+// * this is used to configure authorization rules for HTTP requests in a Spring Security application. This method allows you to specify which requests should be authorized based on roles, permissions, or other criteria.
+                .authorizeHttpRequests((httpRequest)->{
+                    httpRequest.requestMatchers("")
+                })
 
 
 
@@ -60,11 +64,7 @@ public class WebSecurityConfig {
 
 
 
-
-
-
-
-        //        http
+//                http
 //                .csrf(AbstractHttpConfigurer::disable)
 //                .authorizeHttpRequests(req ->
 //                        req.requestMatchers(WHITE_LIST_URL)
@@ -87,6 +87,6 @@ public class WebSecurityConfig {
 //                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
 //                );
 //
-//        return http.build();
+        return http.build();
     }
 }
