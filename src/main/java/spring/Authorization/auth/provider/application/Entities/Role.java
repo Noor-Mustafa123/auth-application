@@ -47,7 +47,7 @@ public enum Role {
 //  The purpose of this code is to convert the set of permissions associated with a role into a list of SimpleGrantedAuthority objects, which are used by Spring Security to represent authorities granted to the user.
                 .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
                 .collect(Collectors.toList());
-//  This way, the list of authorities includes both the specific permissions granted to the user and the role of the user
+//  This way, the list of simpleGrantedAuthorities includes both the specific permissions granted to the user and the role of the user
         authorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
         return authorities;
     }
