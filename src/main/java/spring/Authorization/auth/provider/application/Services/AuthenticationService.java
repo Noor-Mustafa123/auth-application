@@ -1,29 +1,37 @@
 package spring.Authorization.auth.provider.application.Services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.Authorization.auth.provider.application.ControllerLayer.AuthenticationReponse;
-import spring.Authorization.auth.provider.application.Entities.RegisterEntity;
-import spring.Authorization.auth.provider.application.Entities.TokenEntity;
-import spring.Authorization.auth.provider.application.Entities.TokenType;
-import spring.Authorization.auth.provider.application.Entities.User;
+import spring.Authorization.auth.provider.application.Entities.*;
 import spring.Authorization.auth.provider.application.Repositories.TokenRepository;
 import spring.Authorization.auth.provider.application.Repositories.UserRepository;
 
+import java.util.List;
+
+@AllArgsConstructor
+@NoArgsConstructor
 @Service
 public class AuthenticationService {
 
-    @Autowired
+
     private PasswordEncoder passwordEncoder;
-    @Autowired
+
     private jwtTokenService jwtService;
-    @Autowired
+
     private AuthenticationReponse authenticationReponse;
-    @Autowired
+
     private UserRepository userRepo;
-    @Autowired
+
     private TokenRepository tokenRepo;
+
+    private AuthenticationManager authenticationManager;
+
 
     // method to extract data from the request and create user entity object
     // use that object to create a token
@@ -66,6 +74,29 @@ public class AuthenticationService {
 
         return authenticationReponse;
 
+    }
+
+
+    // ! make a method that uses the authorization provider in order to check the user and authenticate it
+// ? AuthenticationManager: This is the main entry point for the authentication process. When you call authenticationManager.authenticate(...), it delegates the actual authentication process to the configured AuthenticationProvider.
+    public AuthenticationReponse authenticateUser(Login loginRequest) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
+        );
+//        get the users details from the database matching and generet tokens and return it to the user
+        List<User> userList = userRepo.findByEmail(loginRequest.getEmail());
+        User user = userList.getFirst();
+
+       String jwtToken = jwtService.generateToken(user);
+       String jwtRefreshToken =  jwtService.generateRefreshToken(user);
+
+       return AuthenticationReponse.builder()
+               .jwtToken(jwtToken)
+               .refreshToken(jwtRefreshToken)
+               .build();
     }
 
 

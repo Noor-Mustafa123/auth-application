@@ -72,6 +72,8 @@ public class ApplicationConfiguration {
 
 //Security Configuration: Configure Spring Security to permit access to authentication endpoints.
 //Authentication Controller: Create a controller to handle registration and authentication requests.
+// *--Create a login entity that maps the user incoming login data
 //Authentication Service: Implement the service to handle business logic for authentication.
 //Application Configuration: Define beans for UserDetailsService, AuthenticationProvider, AuthenticationManager, and PasswordEncoder.
 //By following these steps, you can incorporate the authentication functionality into your own Spring Boot project.
+

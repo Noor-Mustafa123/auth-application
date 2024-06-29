@@ -43,6 +43,8 @@ public class WebSecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
 
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -56,6 +58,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((httpRequest) -> {
                     httpRequest.requestMatchers(WHITE_LIST_URL).permitAll()
                             .requestMatchers("/api/v1/auth/register").permitAll()//Explicitly allowing the register endpoint
+                            .requestMatchers("/api/v1/auth/login").permitAll()//Explicitly allowing the login endpoint
 // This means that any user with the ADMIN or MANAGER role can access any endpoint under /api/v1/management/**.
                             .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
 // Even if a user has the ADMIN or MANAGER role, they must also have the specific permission (authority) to perform the action (GET, POST, PUT, DELETE) on the /api/v1/management/** endpoint.
@@ -70,7 +73,8 @@ public class WebSecurityConfig {
                 .sessionManagement((sessionManConfigObj)->{
                     sessionManConfigObj.sessionCreationPolicy(STATELESS);
                 })
-                .authenticationProvider()
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
                 
 
