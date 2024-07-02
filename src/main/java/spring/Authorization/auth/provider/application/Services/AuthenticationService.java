@@ -1,16 +1,9 @@
 package spring.Authorization.auth.provider.application.Services;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.Authorization.auth.provider.application.ControllerLayer.AuthenticationReponse;
@@ -18,7 +11,6 @@ import spring.Authorization.auth.provider.application.Entities.*;
 import spring.Authorization.auth.provider.application.Repositories.TokenRepository;
 import spring.Authorization.auth.provider.application.Repositories.UserRepository;
 
-import java.security.Principal;
 import java.util.List;
 
 
@@ -28,7 +20,7 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private jwtTokenService jwtService;
+    private JwtTokenService jwtService;
     @Autowired
     private AuthenticationReponse authenticationReponse;
     @Autowired

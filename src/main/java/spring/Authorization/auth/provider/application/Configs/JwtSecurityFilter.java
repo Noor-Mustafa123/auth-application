@@ -1,7 +1,6 @@
 package spring.Authorization.auth.provider.application.Configs;
 
 import io.jsonwebtoken.Claims;
-import io.micrometer.observation.annotation.Observed;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +16,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import spring.Authorization.auth.provider.application.Entities.TokenEntity;
 import spring.Authorization.auth.provider.application.Entities.User;
-import spring.Authorization.auth.provider.application.Services.jwtTokenService;
+import spring.Authorization.auth.provider.application.Services.JwtTokenService;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,7 +25,7 @@ import java.util.Objects;
 @Configuration
 public class JwtSecurityFilter extends OncePerRequestFilter {
     @Autowired
-    jwtTokenService jwtService;
+    JwtTokenService jwtService;
     @Autowired
     UserDetailsService userDetailsService;
 
@@ -74,6 +73,14 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
         String email = jwtService.extractUsername(jwt);
         User user = jwtService.getUserFromDatabase(jwt);
 
+
+//        CHECK WITH TIME IF THE TOKEN IS EXPIRED
+        if(jwtService.isTokenExpired(claims)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unauthorized-Missing jwt Token");
+            System.out.println("the token exp is overdue and expired");
+            return;
+        }
 
 //  ! Here, you're trying to access the tokens collection of a User entity outside of a transactional context. When the user.getTokens() method is called, Hibernate tries to fetch the tokens collection from the database. However, because the Hibernate Session has already been closed (as the findByEmail method has completed), it can't fetch the collection, resulting in the LazyInitializationException.
 
@@ -135,4 +142,5 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
       String path = request.getServletPath();
       return Arrays.stream(WHITE_LIST_URL).anyMatch(pattern-> pathMatcher.match(pattern,path));
     }
+
 }

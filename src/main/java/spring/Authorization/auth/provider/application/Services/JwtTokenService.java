@@ -5,12 +5,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import spring.Authorization.auth.provider.application.Entities.TokenEntity;
 import spring.Authorization.auth.provider.application.Entities.User;
+import spring.Authorization.auth.provider.application.Repositories.TokenRepository;
 import spring.Authorization.auth.provider.application.Repositories.UserRepository;
 
 import java.security.Key;
@@ -23,7 +23,7 @@ import java.util.function.Function;
 
 @Service
 
-public class jwtTokenService {
+public class JwtTokenService {
 
     // Use a secret key with at least 256 bits (32 characters if base64 encoded)
     private final String secretKey = "B5r5aTyLW1vdorJLHs9egCQB3NFgKm9p3kW5qTxMSp9RzU2s"; // Ensure this key is at least 32 bytes long
@@ -34,6 +34,8 @@ public class jwtTokenService {
 
     @Autowired
     UserRepository userRepo;
+    @Autowired
+    TokenRepository tokenRepo;
 
     //simple Token method
     public String generateToken(UserDetails userDetails) {
@@ -137,6 +139,26 @@ public class jwtTokenService {
            }
         return tokenObj;
     }
+
+    public boolean isTokenExpired(Claims claims){
+      return claims.getExpiration().before(new Date());
+    }
+
+
+
+    public TokenEntity isTokenValid(String refreshToken) throws Exception{
+        List<TokenEntity> tokenList = tokenRepo.findTokenEntitiesByRefreshToken(refreshToken);
+        if (tokenList.isEmpty()) {
+            throw new Exception("No token found"); // or throw new Exception("No token found");
+        }
+            return tokenList.get(0);
+
+    }
+
+
+
+
+// method to handle expiry of token
 
 
 }
