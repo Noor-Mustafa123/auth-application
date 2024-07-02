@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.AntPathMatcher;
 import spring.Authorization.auth.provider.application.Entities.User;
 import spring.Authorization.auth.provider.application.Repositories.UserRepository;
 
@@ -56,6 +57,11 @@ public class ApplicationConfiguration {
         authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
+    }
+
+    @Bean
+    public AntPathMatcher antPathMatcher(){
+        return new AntPathMatcher();
     }
 
 

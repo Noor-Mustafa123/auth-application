@@ -2,9 +2,15 @@ package spring.Authorization.auth.provider.application.Services;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.Authorization.auth.provider.application.ControllerLayer.AuthenticationReponse;
@@ -12,24 +18,24 @@ import spring.Authorization.auth.provider.application.Entities.*;
 import spring.Authorization.auth.provider.application.Repositories.TokenRepository;
 import spring.Authorization.auth.provider.application.Repositories.UserRepository;
 
+import java.security.Principal;
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Service
 public class AuthenticationService {
 
-
+    @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @Autowired
     private jwtTokenService jwtService;
-
+    @Autowired
     private AuthenticationReponse authenticationReponse;
-
+    @Autowired
     private UserRepository userRepo;
-
+    @Autowired
     private TokenRepository tokenRepo;
-
+    @Autowired
     private AuthenticationManager authenticationManager;
 
 
@@ -78,26 +84,62 @@ public class AuthenticationService {
 
 
     // ! make a method that uses the authorization provider in order to check the user and authenticate it
-// ? AuthenticationManager: This is the main entry point for the authentication process. When you call authenticationManager.authenticate(...), it delegates the actual authentication process to the configured AuthenticationProvider.
+    // ? AuthenticationManager: This is the main entry point for the authentication process. When you call authenticationManager.authenticate(...), it delegates the actual authentication process to the configured AuthenticationProvider.
     public AuthenticationReponse authenticateUser(Login loginRequest) {
-        authenticationManager.authenticate(
+
+        Authentication authObj = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );
+       System.out.println(authObj.isAuthenticated());
 //        get the users details from the database matching and generet tokens and return it to the user
         List<User> userList = userRepo.findByEmail(loginRequest.getEmail());
         User user = userList.getFirst();
 
-       String jwtToken = jwtService.generateToken(user);
-       String jwtRefreshToken =  jwtService.generateRefreshToken(user);
+        String jwtToken = jwtService.generateToken(user);
+        String jwtRefreshToken = jwtService.generateRefreshToken(user);
 
-       return AuthenticationReponse.builder()
-               .jwtToken(jwtToken)
-               .refreshToken(jwtRefreshToken)
-               .build();
+        System.out.println(jwtRefreshToken);
+
+        revokeUserToken(user);
+        saveUserToken(user, jwtToken, jwtRefreshToken);
+
+
+        return AuthenticationReponse.builder()
+                .jwtToken(jwtToken)
+                .refreshToken(jwtRefreshToken)
+                .build();
     }
+
+
+    public void saveUserToken(User userObj, String token, String refreshToken ) {
+        TokenEntity tokenEntity = TokenEntity.builder()
+                .user(userObj)
+                .token(token)
+                .refreshToken(refreshToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepo.save(tokenEntity);
+    }
+
+    public void revokeUserToken(User user) {
+        List<TokenEntity> validTokens = tokenRepo.findAllValidTokenByUser(user.getId());
+
+        if (validTokens.isEmpty()) {
+            return;
+        }
+        validTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepo.saveAll(validTokens);
+    }
+
+
 
 
 //    TODO: to make the token entity so that i can save the data to the database

@@ -2,6 +2,7 @@ package spring.Authorization.auth.provider.application.ControllerLayer;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,12 +15,11 @@ import spring.Authorization.auth.provider.application.Services.AuthenticationSer
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@AllArgsConstructor
-@NoArgsConstructor
 public class AuthenticationController {
 
     @Autowired
     private AuthenticationService authenticationService;
+    @Autowired
     private Login loginObj;
 
     @PostMapping("/register")
@@ -32,10 +32,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.authenticateUser(loginObj));
     }
 
-    @PostMapping("/authenticate")
-//     I have made this change
-    public void registerNewUser() {
-        System.out.println("The controller has been reached");
-    }
+
+
 
 }

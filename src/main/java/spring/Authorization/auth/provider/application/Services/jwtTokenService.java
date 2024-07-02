@@ -108,7 +108,7 @@ public class jwtTokenService {
     }
 
 
-    public User getUserFromDatabase(String jwt){
+    public User getUserFromDatabase(String jwt) {
         String email = extractUsername(jwt);
         System.out.println("Email extracted from JWT: " + email);
         List<User> userList = userRepo.findByEmail(email);
@@ -124,11 +124,18 @@ public class jwtTokenService {
     public TokenEntity getTokenObjFromUserObj(String jwt) {
         User userObj = getUserFromDatabase(jwt);
         List<TokenEntity> listOfTokens = userObj.getTokens();
+        System.out.println(listOfTokens);
 
 //        this is getting the token from the database
-        TokenEntity tokenObj = listOfTokens.getFirst();
 
-       return tokenObj;
+        listOfTokens.removeIf(token -> token.isExpired() || token.isRevoked());
+
+
+        TokenEntity tokenObj = null;
+       if(!listOfTokens.isEmpty()){
+         tokenObj = listOfTokens.getFirst();
+           }
+        return tokenObj;
     }
 
 

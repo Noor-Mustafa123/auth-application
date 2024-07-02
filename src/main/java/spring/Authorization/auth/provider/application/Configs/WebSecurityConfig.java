@@ -59,6 +59,7 @@ public class WebSecurityConfig {
                     httpRequest.requestMatchers(WHITE_LIST_URL).permitAll()
                             .requestMatchers("/api/v1/auth/register").permitAll()//Explicitly allowing the register endpoint
                             .requestMatchers("/api/v1/auth/login").permitAll()//Explicitly allowing the login endpoint
+                            .requestMatchers("/api/v1/auth/authenticate").permitAll()//explicitly allowing the authenticate plugin for testing purposes
 // This means that any user with the ADMIN or MANAGER role can access any endpoint under /api/v1/management/**.
                             .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
 // Even if a user has the ADMIN or MANAGER role, they must also have the specific permission (authority) to perform the action (GET, POST, PUT, DELETE) on the /api/v1/management/** endpoint.
